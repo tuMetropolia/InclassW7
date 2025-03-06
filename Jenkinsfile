@@ -54,8 +54,18 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
-                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    // Use Docker registry credentials to push images
+                    def commitHash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def imageTag = "${DOCKERHUB_USER}/${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}"
+                    def commitTag = "${DOCKERHUB_USER}/${DOCKERHUB_REPO}:${commitHash}"
+
+                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Log in to Docker Hub
+                        sh "/usr/local/bin/docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}"
+
+                        // Push Docker images to Docker Hub
+                        sh "/usr/local/bin/docker push ${imageTag}"
+                        sh "/usr/local/bin/docker push ${commitTag}"
                     }
                 }
             }
