@@ -7,6 +7,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
         DOCKERHUB_REPO = 'mitudinh/week7_inclass'
         DOCKER_IMAGE_TAG = 'latest_v1'
+        DOCKERHUB_USER = 'mitudinh'
     }
     stages {
         stage('Checkout') {
