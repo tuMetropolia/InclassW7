@@ -37,12 +37,16 @@ pipeline {
                 junit '**/target/surefire-reports/*.xml'
             }
         }
+
         stage('Publish Coverage Report') {
             steps {
                 jacoco()
             }
         }
-
+        stage('Verify Docker Installation') {
+            steps {
+                sh 'docker --version'
+            }
          stage('Build Docker Image') {
                     steps {
                         // Build Docker image
