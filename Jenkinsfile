@@ -55,16 +55,12 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    def commitHash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    def imageTag = "${DOCKERHUB_USER}/${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}"
-                    def commitTag = "${DOCKERHUB_USER}/${DOCKERHUB_REPO}:${commitHash}"
-
                     withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USER} --password-stdin"
+                        // Log in to Docker Hub
+                        sh "/usr/local/bin/docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}"
 
-                        sh "docker push ${imageTag}"
-                        sh "docker tag ${imageTag} ${commitTag}"
-                        sh "docker push ${commitTag}"
+                        // Push Docker images to Docker Hub
+                        sh "/usr/local/bin/docker push ${DOCKER_IMAGE_TAG}"
                     }
                 }
             }
